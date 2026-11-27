@@ -1,0 +1,632 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atmosphere Quest - Game Geografi</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#d9f1ff,#eef5ff,#d9f7e9);
+    color: #18304d;
+}
+
+.container {
+    max-width: 850px;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+.header {
+    background: linear-gradient(120deg,#10233f,#2463a5);
+    color: white;
+    padding: 35px 25px;
+    border-radius: 22px;
+    text-align: center;
+}
+
+.header h1 {
+    font-size: 34px;
+    margin: 10px 0;
+}
+
+.header p {
+    line-height: 1.6;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 20px;
+    margin-top: 20px;
+    box-shadow: 0 8px 25px #173b6015;
+}
+
+button {
+    border: none;
+    padding: 14px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: .2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+.start-btn, .next-btn {
+    background: #2463eb;
+    color: white;
+    width: 100%;
+    margin-top: 15px;
+}
+
+.option {
+    width: 100%;
+    text-align: left;
+    margin: 7px 0;
+    background: #edf4fc;
+    color: #18304d;
+    border: 2px solid #dce8f5;
+}
+
+.option:hover:not(:disabled) {
+    background: #dcecff;
+}
+
+.option.correct {
+    background: #d5f6e5;
+    border-color: #15965d;
+    color: #12623f;
+}
+
+.option.wrong {
+    background: #ffe0e2;
+    border-color: #dc3545;
+    color: #9d1f2d;
+}
+
+.option:disabled {
+    cursor: default;
+    opacity: 1;
+}
+
+.info {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.progress {
+    background: #e5edf5;
+    height: 12px;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 25px;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(90deg,#2463eb,#20b77b);
+    transition: .3s;
+}
+
+.question {
+    font-size: 21px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.feedback {
+    display: none;
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 15px;
+    line-height: 1.6;
+}
+
+.feedback.show {
+    display: block;
+}
+
+.good {
+    background: #e2f8ed;
+    color: #12623f;
+}
+
+.bad {
+    background: #fff0f0;
+    color: #a32835;
+}
+
+.result {
+    text-align: center;
+}
+
+.score {
+    font-size: 55px;
+    color: #2463eb;
+    font-weight: bold;
+}
+
+.hidden {
+    display: none;
+}
+
+.review {
+    text-align: left;
+    margin-top: 25px;
+}
+
+.review-item {
+    background: #f3f7fb;
+    padding: 13px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+@media(max-width:600px) {
+    .header h1 {font-size: 27px;}
+    .container {margin: 10px auto;}
+    .card {padding: 18px;}
+    .question {font-size: 18px;}
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+    <h1>🌍 ATMOSPHERE QUEST</h1>
+    <h3>GAME KUIS GEOGRAFI KELAS X</h3>
+    <p>
+        Jelajahi atmosfer Bumi melalui 15 tantangan soal pilihan ganda.
+        Buktikan kemampuanmu dan raih skor tertinggi!
+    </p>
+</div>
+
+<!-- HALAMAN AWAL -->
+<div class="card" id="start">
+    <h2>☁️ Selamat Datang!</h2>
+    <p>
+        Game pembelajaran Geografi materi Atmosfer.
+        Jawablah 15 pertanyaan dengan memilih salah satu
+        jawaban A, B, C, atau D.
+    </p>
+    <p>🏆 Setiap jawaban benar mendapatkan 1 poin.</p>
+    <button class="start-btn" onclick="startGame()">
+        MULAI PERMAINAN 🚀
+    </button>
+</div>
+
+<!-- HALAMAN KUIS -->
+<div class="card hidden" id="game">
+
+    <div class="info">
+        <span id="number">Soal 1 dari 15</span>
+        <span id="score">Skor: 0</span>
+    </div>
+
+    <div class="progress">
+        <div class="progress-bar" id="progress"></div>
+    </div>
+
+    <h3 id="topic">MATERI ATMOSFER</h3>
+
+    <div class="question" id="question"></div>
+
+    <div id="options"></div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <button class="next-btn" id="next"
+        onclick="nextQuestion()" disabled>
+        SOAL BERIKUTNYA →
+    </button>
+
+</div>
+
+<!-- HALAMAN HASIL -->
+<div class="card result hidden" id="result">
+
+    <h2>🏆 PERMAINAN SELESAI!</h2>
+
+    <p>Skor Akhir Kamu</p>
+
+    <div class="score" id="finalScore">0/15</div>
+
+    <h3 id="message"></h3>
+
+    <p id="percentage"></p>
+
+    <button class="start-btn" onclick="startGame()">
+        🔄 MAIN LAGI
+    </button>
+
+    <div class="review">
+        <h3>📚 PEMBAHASAN JAWABAN</h3>
+        <div id="reviewList"></div>
+    </div>
+
+</div>
+
+<footer>
+    ATMOSPHERE QUEST | MEDIA PEMBELAJARAN GEOGRAFI KELAS X
+</footer>
+
+</div>
+
+<script>
+
+// ===================================
+// BANK SOAL ATMOSFER (15 SOAL)
+// ===================================
+
+const questions = [
+
+{
+topic:"Pengertian Atmosfer",
+q:"Atmosfer adalah lapisan gas yang menyelimuti Bumi dan dipertahankan oleh ....",
+a:["Gaya gravitasi Bumi","Gaya magnet Matahari","Arus laut dunia","Rotasi Bulan"],
+c:0,
+e:"Gravitasi Bumi menahan gas-gas agar tetap menyelimuti planet."
+},
+
+{
+topic:"Komposisi Atmosfer",
+q:"Gas yang jumlahnya paling besar dalam atmosfer Bumi adalah ....",
+a:["Oksigen","Nitrogen","Karbon dioksida","Argon"],
+c:1,
+e:"Nitrogen menyusun sekitar 78% volume udara kering."
+},
+
+{
+topic:"Lapisan Atmosfer",
+q:"Sebagian besar gejala cuaca, seperti hujan, awan, dan angin berlangsung di lapisan ....",
+a:["Stratosfer","Mesosfer","Troposfer","Termosfer"],
+c:2,
+e:"Troposfer merupakan lapisan terbawah atmosfer dan tempat berlangsungnya sebagian besar fenomena cuaca."
+},
+
+{
+topic:"Lapisan Atmosfer",
+q:"Lapisan atmosfer yang mengandung konsentrasi ozon relatif tinggi adalah ....",
+a:["Troposfer","Stratosfer","Mesosfer","Eksosfer"],
+c:1,
+e:"Lapisan ozon berada terutama di stratosfer dan menyerap sebagian besar radiasi ultraviolet."
+},
+
+{
+topic:"Lapisan Atmosfer",
+q:"Sebagian besar meteor terbakar ketika memasuki atmosfer pada lapisan ....",
+a:["Mesosfer","Troposfer","Stratosfer","Eksosfer"],
+c:0,
+e:"Mesosfer merupakan tempat banyak meteor mengalami pemanasan dan terbakar."
+},
+
+{
+topic:"Cuaca dan Iklim",
+q:"Perbedaan utama cuaca dan iklim terletak pada ....",
+a:["Warna awan","Luas wilayah dan jangka waktu pengamatan","Jenis alat pengukur suhu","Arah rotasi Bumi"],
+c:1,
+e:"Cuaca berlangsung dalam waktu relatif singkat, sedangkan iklim merupakan pola rata-rata cuaca dalam jangka panjang."
+},
+
+{
+topic:"Unsur Cuaca dan Iklim",
+q:"Alat yang digunakan untuk mengukur tekanan udara adalah ....",
+a:["Termometer","Anemometer","Barometer","Higrometer"],
+c:2,
+e:"Barometer digunakan untuk mengukur tekanan udara."
+},
+
+{
+topic:"Unsur Cuaca dan Iklim",
+q:"Kelembapan udara menunjukkan banyaknya ....",
+a:["Uap air di udara","Debu di atmosfer","Oksigen di tanah","Panas dari inti Bumi"],
+c:0,
+e:"Kelembapan berkaitan dengan kandungan uap air di udara."
+},
+
+{
+topic:"Unsur Cuaca dan Iklim",
+q:"Angin bergerak secara umum dari daerah ....",
+a:["Bertekanan rendah ke tinggi","Bertekanan tinggi ke rendah","Bersuhu tinggi ke rendah saja","Berkelambapan rendah ke tinggi"],
+c:1,
+e:"Angin bergerak dari daerah bertekanan udara tinggi menuju daerah bertekanan lebih rendah."
+},
+
+{
+topic:"Unsur Cuaca dan Iklim",
+q:"Alat untuk mengukur kecepatan angin disebut ....",
+a:["Ombrometer","Barometer","Anemometer","Heliograf"],
+c:2,
+e:"Anemometer digunakan untuk mengukur kecepatan angin."
+},
+
+{
+topic:"Awan dan Hujan",
+q:"Hujan yang terjadi karena udara lembap naik mengikuti lereng pegunungan disebut hujan ....",
+a:["Zenital","Orografis","Frontal","Buatan"],
+c:1,
+e:"Hujan orografis terjadi ketika udara lembap dipaksa naik oleh pegunungan, lalu mendingin dan mengalami kondensasi."
+},
+
+{
+topic:"Awan dan Hujan",
+q:"Proses perubahan uap air menjadi titik-titik air yang membentuk awan disebut ....",
+a:["Evaporasi","Infiltrasi","Kondensasi","Transpirasi"],
+c:2,
+e:"Kondensasi merupakan perubahan uap air menjadi cair akibat pendinginan."
+},
+
+{
+topic:"Pemanasan Global",
+q:"Peningkatan konsentrasi gas rumah kaca di atmosfer dapat menyebabkan ....",
+a:["Penurunan suhu Bumi terus-menerus","Peningkatan suhu rata-rata Bumi","Hilangnya seluruh awan","Berhentinya siklus air"],
+c:1,
+e:"Gas rumah kaca menahan sebagian radiasi panas sehingga memperkuat efek rumah kaca."
+},
+
+{
+topic:"Iklim Indonesia",
+q:"Salah satu ciri iklim tropis yang dimiliki sebagian besar wilayah Indonesia adalah ....",
+a:["Mengalami empat musim","Suhu relatif hangat sepanjang tahun","Selalu tertutup salju","Siang selalu lebih pendek daripada malam"],
+c:1,
+e:"Wilayah tropis umumnya memiliki suhu hangat sepanjang tahun."
+},
+
+{
+topic:"Manfaat Atmosfer",
+q:"Salah satu peran penting atmosfer bagi kehidupan di Bumi adalah ....",
+a:["Menghentikan seluruh gempa bumi","Melindungi Bumi dan membantu menjaga kestabilan suhu","Menghilangkan semua gelombang laut","Menghentikan pergerakan lempeng"],
+c:1,
+e:"Atmosfer membantu menyaring radiasi berbahaya, membakar banyak benda kecil dari angkasa, dan mengatur keseimbangan energi Bumi."
+}
+
+];
+
+// ===================================
+// VARIABEL PERMAINAN
+// ===================================
+
+let current = 0;
+let score = 0;
+let answers = [];
+
+// ===================================
+// MEMULAI GAME
+// ===================================
+
+function startGame(){
+
+    current = 0;
+    score = 0;
+    answers = [];
+
+    document.getElementById("start").classList.add("hidden");
+    document.getElementById("result").classList.add("hidden");
+    document.getElementById("game").classList.remove("hidden");
+
+    showQuestion();
+}
+
+// ===================================
+// MENAMPILKAN SOAL
+// ===================================
+
+function showQuestion(){
+
+    const q = questions[current];
+
+    document.getElementById("number").innerText =
+        "Soal " + (current+1) + " dari 15";
+
+    document.getElementById("score").innerText =
+        "Skor: " + score;
+
+    document.getElementById("progress").style.width =
+        (current/15*100) + "%";
+
+    document.getElementById("topic").innerText =
+        q.topic.toUpperCase();
+
+    document.getElementById("question").innerText =
+        q.q;
+
+    document.getElementById("options").innerHTML = "";
+
+    document.getElementById("feedback").className = "feedback";
+    document.getElementById("feedback").innerHTML = "";
+
+    document.getElementById("next").disabled = true;
+
+    document.getElementById("next").innerText =
+        current === 14 ? "LIHAT HASIL 🏆" : "SOAL BERIKUTNYA →";
+
+    q.a.forEach((option,index)=>{
+
+        const button = document.createElement("button");
+
+        button.className = "option";
+
+        button.innerText =
+            String.fromCharCode(65+index) + ". " + option;
+
+        button.onclick = ()=>checkAnswer(index);
+
+        document.getElementById("options").appendChild(button);
+
+    });
+
+}
+
+// ===================================
+// MEMERIKSA JAWABAN
+// ===================================
+
+function checkAnswer(choice){
+
+    const q = questions[current];
+
+    const correct = choice === q.c;
+
+    answers[current] = {
+        choice:choice,
+        correct:correct
+    };
+
+    if(correct){
+        score++;
+    }
+
+    const buttons =
+        document.querySelectorAll(".option");
+
+    buttons.forEach((button,index)=>{
+
+        button.disabled = true;
+
+        if(index === q.c){
+            button.classList.add("correct");
+        }
+
+        if(index === choice && !correct){
+            button.classList.add("wrong");
+        }
+
+    });
+
+    const feedback =
+        document.getElementById("feedback");
+
+    feedback.className =
+        "feedback show " + (correct ? "good" : "bad");
+
+    if(correct){
+
+        feedback.innerHTML =
+            "<strong>✓ BENAR!</strong><br>" + q.e;
+
+    }else{
+
+        feedback.innerHTML =
+            "<strong>✗ BELUM TEPAT!</strong><br>" +
+            "Jawaban benar: " +
+            String.fromCharCode(65+q.c) + ". " +
+            q.a[q.c] + "<br>" + q.e;
+
+    }
+
+    document.getElementById("score").innerText =
+        "Skor: " + score;
+
+    document.getElementById("next").disabled = false;
+
+}
+
+// ===================================
+// SOAL BERIKUTNYA
+// ===================================
+
+function nextQuestion(){
+
+    if(current < questions.length-1){
+
+        current++;
+
+        showQuestion();
+
+    }else{
+
+        showResult();
+
+    }
+
+}
+
+// ===================================
+// HASIL AKHIR
+// ===================================
+
+function showResult(){
+
+    document.getElementById("game").classList.add("hidden");
+
+    document.getElementById("result").classList.remove("hidden");
+
+    document.getElementById("progress").style.width = "100%";
+
+    const percent = Math.round(score/15*100);
+
+    document.getElementById("finalScore").innerText =
+        score + "/15";
+
+    document.getElementById("percentage").innerText =
+        "Nilai akhir: " + percent + "/100";
+
+    let message = "";
+
+    if(percent >= 87){
+        message = "🌟 LUAR BIASA! Kamu menguasai materi atmosfer!";
+    }
+    else if(percent >= 73){
+        message = "👏 BAGUS! Terus tingkatkan pengetahuanmu!";
+    }
+    else if(percent >= 60){
+        message = "👍 CUKUP BAIK! Pelajari kembali pembahasan!";
+    }
+    else{
+        message = "💪 TETAP SEMANGAT! Ayo belajar dan coba lagi!";
+    }
+
+    document.getElementById("message").innerText = message;
+
+    // MENAMPILKAN PEMBAHASAN
+
+    let reviewHTML = "";
+
+    questions.forEach((q,index)=>{
+
+        reviewHTML += `
+        <div class="review-item">
+            <strong>${index+1}. ${q.q}</strong><br>
+            Jawaban benar:
+            ${String.fromCharCode(65+q.c)}. ${q.a[q.c]}
+            <br>
+            <span>${q.e}</span>
+        </div>
+        `;
+
+    });
+
+    document.getElementById("reviewList").innerHTML =
+        reviewHTML;
+
+}
+
+</script>
+
+</body>
+</html>
